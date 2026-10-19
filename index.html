@@ -1,570 +1,253 @@
 <!doctype html>
-<html lang="hi-Latn">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>10Sports — Apni ID paayein</title>
-<meta name="description" content="Humse chat karein aur 2 minute mein apni ID paayein.">
-<meta name="theme-color" content="#008069">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>
+/* ============================ SETTINGS ============================
+   SIGNUP_URL_B / SIGNUP_URL_C: where each version's button goes. Give C its OWN referral code
+     so the back-office can count C's sign-ups and FTDs separately (until then both use B's code).
+   SPLIT_C: share of new visitors who see version C (0.5 = 50/50). A visitor keeps their version.
+     ?ab=b or ?ab=c in the URL forces one version (for checking).
+   MATCHES: today's fixtures for the match strip. One line per match; only matches dated today show
+     (at most 2). Empty = no strip, and ?v=match ads fall back to the offer headline.
+       { d: "2026-10-19", t: "IND vs AUS", time: "7:30 PM IST", tour: "1st ODI" }
+   Plain ES5 throughout, so it runs on 2016-era phone browsers. */
+var SIGNUP_URL_B = "https://10sports.cricket/register/?c=IY2tQoO3b";
+var SIGNUP_URL_C = "https://10sports.cricket/register/?c=IY2tQoO3b";
+var SPLIT_C = 1;   /* 10sports.walink.dev: version C for everyone */
+var META_PIXEL_ID = "1585304069368231";
+var STATS_URL = "https://newid.walink.dev/t";
+var MATCHES = [];
+/* Headline per ad: add ?v=offer, ?v=match or ?v=id to the ad's URL (no v = "id"). */
+var HEADLINES = {
+  id:    { h: "Get your 10Sports ID in 2&nbsp;minutes",          s: "Free sign-up with your mobile number. Deposit from &#8377;300 with 4% extra." },
+  offer: { h: "4% extra on every deposit + 10% weekly lossback", s: "Get your 10Sports ID in 2 minutes. Deposits start at just &#8377;300." },
+  match: { h: "{t} today. Get your ID before the toss.",         s: "Free sign-up in 2 minutes. Deposit from &#8377;300 with 4% extra." }
+};
+/* ================================================================== */
+var AB = (function () {
+  var v = null, m = /(?:^|[?&])ab=([bc])(?:&|$)/.exec(location.search);
+  if (m) v = m[1];
+  else {
+    try { v = localStorage.getItem("ab10s"); } catch (e) {}
+    if (v !== "b" && v !== "c") {
+      v = Math.random() < SPLIT_C ? "c" : "b";
+      try { localStorage.setItem("ab10s", v); } catch (e) {}
+    }
+  }
+  document.documentElement.className = "v-" + v;
+  return v;
+})();
+</script>
+<title>Get your 10Sports ID in 2 minutes</title>
+<meta name="description" content="Get your 10Sports ID in 2 minutes. Free sign-up with your mobile number and OTP.">
+<meta name="theme-color" content="#06110b">
 <meta name="format-detection" content="telephone=no">
-<link rel="icon" href="logo.jpg" type="image/jpeg">
-<link rel="apple-touch-icon" href="logo.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ff8a1f'/%3E%3Ctext x='16' y='22' font-size='15' font-weight='900' text-anchor='middle' fill='%231c0a00' font-family='Arial'%3E10%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://10sports.cricket">
-<link rel="dns-prefetch" href="https://connect.facebook.net">
 <link rel="dns-prefetch" href="https://10sports.cricket">
 <style>
-  :root {
-    --header: #008069;
-    --accent: #25d366;
-    --btn: #008069;
-    --page: #f3f5ef;
-    --chat-bg: #f4f3ec;
-    --bubble-in: #ffffff;
-    --bubble-out: #d9fdd3;
-    --text: #111b21;
-    --muted: #54656f;
-    --notice: #fdf6d8;
-    --border: #e6e6df;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--page); color: var(--text);
-    display: flex; justify-content: center;
-  }
-  .app {
-    width: 100%; max-width: 420px; height: 100vh; height: 100dvh;
-    display: flex; flex-direction: column;
-    background: var(--chat-bg);
-    box-shadow: 0 0 24px rgba(0,0,0,.08);
-    position: relative;
-  }
-  button { font: inherit; cursor: pointer; border: 0; background: none; color: inherit; }
-  a { color: inherit; text-decoration: none; }
-  svg { display: block; }
-
-  /* Header */
-  header {
-    background: var(--header); color: #fff;
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 10px; flex-shrink: 0;
-  }
-  .avatar {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: #231f20; color: #f5c542; font-weight: 700; font-size: 12px;
-    display: grid; place-items: center; flex-shrink: 0; position: relative; overflow: hidden;
-  }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; }
-  header .avatar::after {
-    content: ""; position: absolute; right: 0; bottom: 0;
-    width: 9px; height: 9px; border-radius: 50%;
-    background: var(--accent); border: 2px solid var(--header);
-  }
-  .who { flex: 1; min-width: 0; line-height: 1.2; }
-  .who b { display: block; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .who span { font-size: 11px; }
-  .hbtn {
-    width: 32px; height: 32px; border-radius: 50%;
-    display: grid; place-items: center; color: #fff;
-    background: rgba(255,255,255,.14);
-  }
-  .getid {
-    display: flex; align-items: center; gap: 6px;
-    background: #fff; color: #008069;
-    padding: 7px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
-    white-space: nowrap;
-  }
-  .hbtn[hidden] { display: none; }
-  .hbtn:hover, .getid:hover { filter: brightness(1.08); }
-
-  /* Offer strip */
-  .offer {
-    background: #fff; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 8px; padding: 7px 12px;
-    font-size: 12px; flex-shrink: 0;
-  }
-  .offer b { color: var(--header); }
-  .offer p { flex: 1; }
-  .offer button {
-    background: var(--header); color: #fff; font-weight: 600;
-    border-radius: 999px; padding: 5px 11px; font-size: 11.5px; white-space: nowrap;
-  }
-
-  /* Messages */
-  main {
-    flex: 1; overflow-y: auto; padding: 10px 10px 12px;
-    display: flex; flex-direction: column; gap: 6px;
-    background-color: var(--chat-bg);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' fill='none' stroke='%23e2e1d6' stroke-width='1.6'%3E%3Ccircle cx='15' cy='15' r='6'/%3E%3Cpath d='M40 9h14a3 3 0 013 3v8a3 3 0 01-3 3h-9l-5 4v-4a3 3 0 01-3-3v-8a3 3 0 013-3z'/%3E%3Crect x='72' y='9' width='12' height='12' rx='2'/%3E%3Cpath d='M100 15h12M106 9v12'/%3E%3Cpath d='M8 50q7-8 14 0'/%3E%3Cpath d='M42 46l8 8M50 46l-8 8'/%3E%3Ccircle cx='78' cy='50' r='5'/%3E%3Cpath d='M98 44l6 6-6 6-6-6z'/%3E%3Crect x='9' y='80' width='12' height='12' rx='2'/%3E%3Cpath d='M44 80v14'/%3E%3Cpath d='M70 92q8-12 16 0'/%3E%3Ccircle cx='106' cy='86' r='5'/%3E%3C/svg%3E");
-  }
-  .notice {
-    align-self: center; max-width: 92%;
-    background: var(--notice); color: #54656f;
-    font-size: 10.5px; padding: 5px 10px; border-radius: 6px;
-    display: flex; align-items: center; gap: 6px; text-align: center; margin-bottom: 4px;
-  }
-  .row { display: flex; align-items: flex-end; gap: 6px; max-width: 86%; animation: pop .18s ease-out; }
-  @keyframes pop { from { opacity: 0; transform: translateY(4px); } }
-  .row.in { align-self: flex-start; }
-  .row.out { align-self: flex-end; }
-  .row .avatar { width: 24px; height: 24px; font-size: 8px; }
-  .row .avatar::after { display: none; }
-  .row.in.cont .avatar { visibility: hidden; }
-  .bubble {
-    padding: 6px 8px 4px 9px; border-radius: 8px; font-size: 14px; line-height: 1.38;
-    box-shadow: 0 1px .5px rgba(11,20,26,.13);
-    overflow-wrap: anywhere; white-space: pre-line;
-  }
-  .in .bubble { background: var(--bubble-in); border-top-left-radius: 2px; }
-  .out .bubble { background: var(--bubble-out); border-top-right-radius: 2px; }
-  .meta {
-    display: flex; justify-content: flex-end; align-items: center; gap: 3px;
-    font-size: 10px; color: var(--muted); margin-top: 2px;
-  }
-  .ticks { color: #53bdeb; }
-  .typing .bubble { display: flex; gap: 3px; padding: 10px 12px; }
-  .typing i { width: 6px; height: 6px; border-radius: 50%; background: #9aa5ab; animation: blink 1.2s infinite; }
-  .typing i:nth-child(2) { animation-delay: .2s; }
-  .typing i:nth-child(3) { animation-delay: .4s; }
-  @keyframes blink { 0%,60%,100% { opacity: .3; } 30% { opacity: 1; } }
-
-  /* Quick replies + CTA */
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding-left: 30px; margin: 2px 0 4px; }
-  .chip {
-    background: #fff; color: var(--header); font-weight: 600; font-size: 13px;
-    border: 1.5px solid var(--header); border-radius: 999px; padding: 7px 13px;
-  }
-  .chip:hover { background: var(--header); color: #fff; }
-  .cta {
-    margin: 4px 0 4px 30px; align-self: flex-start;
-    display: flex; align-items: center; gap: 8px;
-    background: var(--btn); color: #fff; font-weight: 700; font-size: 15px;
-    padding: 12px 18px; border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,128,105,.3);
-  }
-  .cta:hover { filter: brightness(1.06); }
-
-  /* Composer */
-  footer { flex-shrink: 0; background: var(--chat-bg); border-top: 1px solid var(--border); }
-  .main-cta {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin: 8px 10px 0; min-height: 50px; border-radius: 12px;
-    background: var(--btn); color: #fff;
-    font-size: 18px; font-weight: 800; letter-spacing: .4px;
-    box-shadow: 0 3px 10px rgba(0,128,105,.35);
-    animation: nudge 2.4s ease-in-out infinite;
-  }
-  .main-cta:hover { filter: brightness(1.06); }
-  .main-cta:active { transform: scale(.98); }
-  .go {
-    position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 10; display: grid; place-items: center;
-    background: rgba(17,27,33,.35); animation: fade .15s ease-out;
-  }
-  .go[hidden] { display: none; }
-  .go-card {
-    width: 86%; max-width: 280px; background: #fff; border-radius: 14px; padding: 18px 16px 14px;
-    text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,.2);
-  }
-  .go-card b { display: block; font-size: 18px; color: var(--text); }
-  .go-card span { display: block; font-size: 12.5px; color: var(--muted); margin-top: 4px; }
-  .go-bar { height: 4px; border-radius: 4px; background: #e9edef; margin-top: 12px; overflow: hidden; }
-  .go-bar i { display: block; height: 100%; width: 100%; background: var(--btn); transform-origin: left; animation: fill .9s linear both; }
-  @keyframes fill { from { transform: scaleX(0); } }
-  @keyframes fade { from { opacity: 0; } }
-  @keyframes nudge { 0%, 85%, 100% { transform: scale(1); } 92% { transform: scale(1.03); } }
-  .rg { text-align: center; font-size: 10px; color: var(--muted); padding: 4px 10px 0; }
-  .composer {
-    display: flex; align-items: center; gap: 6px; padding: 6px 10px 8px;
-    padding-bottom: 8px; padding-bottom: max(8px, env(safe-area-inset-bottom));
-  }
-  .field {
-    flex: 1; min-width: 0; font: inherit; font-size: 15px;
-    border: 1px solid var(--border); background: #fff;
-    border-radius: 999px; padding: 10px 14px; outline: none;
-  }
-  .field:focus { border-color: var(--header); }
-  .send {
-    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
-    background: var(--header); color: #fff; display: grid; place-items: center;
-  }
-  .send:disabled { opacity: .5; }
-  .chip, .offer button { min-height: 32px; }
-  :focus-visible { outline: 2px solid #111b21; outline-offset: 2px; }
-  header :focus-visible { outline-color: #fff; }
-  .field:focus-visible { outline: none; border-color: var(--header); box-shadow: 0 0 0 2px rgba(0,128,105,.25); }
-  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
-  }
+/* 2016+ browsers: no CSS variables, no flex "gap"; spacing uses margins. */
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#06110b}
+body{min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#eef7f1;background:#06110b;background-image:radial-gradient(ellipse at 50% 0,rgba(37,211,102,.2),transparent 60%),radial-gradient(ellipse at 50% 100%,rgba(110,80,220,.2),transparent 60%);background-repeat:no-repeat;padding:20px 16px 32px;-webkit-text-size-adjust:100%}
+.v-b .c-only,.v-c .b-only{display:none!important}
+.v-b body{padding-bottom:100px}
+.w{max-width:440px;margin:0 auto}
+.fx{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center}
+.brand{font-size:17px;font-weight:800}
+.logo{width:40px;height:40px;border-radius:12px;margin-right:10px;-webkit-flex-shrink:0;flex-shrink:0;background:#231f20 url(data:image/jpeg;base64,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) center/cover no-repeat}
+.brand small{margin-left:auto;font-size:12px;font-weight:700;color:#a9bbb0}
+h1{margin-top:22px;font-size:34px;line-height:1.08;letter-spacing:-.8px;font-weight:900}
+.sub{margin-top:10px;font-size:15.5px;line-height:1.5;color:#a9bbb0}
+.cta,.stk{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-orient:vertical;-webkit-flex-direction:column;flex-direction:column;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;background:#ff8a1f;color:#1c0a00;text-decoration:none;text-align:center;-webkit-tap-highlight-color:transparent}
+.cta{position:relative;overflow:hidden;margin-top:22px;min-height:74px;border-radius:18px;box-shadow:0 0 0 5px rgba(255,138,31,.16),0 12px 30px rgba(255,120,20,.3)}
+.cta strong{font-size:21px;font-weight:900}
+.cta span{margin-top:2px;font-size:13px;font-weight:700;color:#4a2300}
+.cta:after{content:"";position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);-webkit-transform:translateX(-150%) skewX(-20deg);transform:translateX(-150%) skewX(-20deg)}
+.anim .cta:after{-webkit-animation:shine 3.4s ease-in-out infinite;animation:shine 3.4s ease-in-out infinite}
+@-webkit-keyframes shine{0%{-webkit-transform:translateX(-150%) skewX(-20deg)}28%,100%{-webkit-transform:translateX(330%) skewX(-20deg)}}
+@keyframes shine{0%{transform:translateX(-150%) skewX(-20deg)}28%,100%{transform:translateX(330%) skewX(-20deg)}}
+.cta:active,.stk:active{opacity:.9}
+.ticks{margin-top:12px;text-align:center;font-size:13px;font-weight:700;color:#a9bbb0}
+.ticks span{display:inline-block;margin:0 7px}
+.ticks span:before{content:"\2713  ";color:#8af0ad}
+ol{list-style:none;counter-reset:s}
+li{counter-increment:s;position:relative;padding-left:40px;min-height:28px;line-height:1.35;padding-top:4px;font-size:15px;margin-top:12px}
+li:first-child{margin-top:0}
+li:before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;line-height:28px;border-radius:50%;text-align:center;background:rgba(126,224,165,.14);color:#8af0ad;font-size:14px;font-weight:800}
+.b-steps{margin-top:26px;padding-top:18px;border-top:1px solid rgba(120,220,160,.16)}
+.rg{margin-top:22px;text-align:center;font-size:11px;color:#a9bbb0}
+.stk{position:fixed;left:12px;right:12px;bottom:12px;z-index:20;min-height:58px;border-radius:16px;font-size:18px;font-weight:900;box-shadow:0 10px 30px rgba(0,0,0,.5);-webkit-transform:translateY(150%);transform:translateY(150%);-webkit-transition:-webkit-transform .25s;transition:transform .25s}
+.stk.show{-webkit-transform:none;transform:none}
+/* ---------- Version C ---------- */
+.match{display:none;margin-top:16px;padding:9px 12px;border-radius:12px;background:rgba(255,138,31,.1);border:1px solid rgba(255,138,31,.35);font-size:13.5px;font-weight:700}
+.match.on{display:block}
+.match p{margin-top:4px}
+.match p:first-child{margin-top:0}
+.live{display:inline-block;margin-right:8px;padding:2px 7px;border-radius:6px;background:#ff8a1f;color:#1c0a00;font-size:11px;font-weight:900;letter-spacing:.6px;vertical-align:1px}
+.match em{font-style:normal;color:#ffc48f;margin-left:6px}
+.v-c h1{margin-top:18px;font-size:31px}
+.offers{margin-top:18px;-webkit-box-align:stretch;-webkit-align-items:stretch;align-items:stretch}
+.offer{-webkit-box-flex:1;-webkit-flex:1 1 0;flex:1 1 0;min-width:0;margin-left:8px;padding:10px 4px 9px;border-radius:14px;background:#12231a;border:1px solid rgba(120,220,160,.16);text-align:center}
+.offer:first-child{margin-left:0}
+.offer b{display:block;font-size:22px;line-height:1;font-weight:900;color:#8af0ad}
+.offer span{display:block;margin-top:5px;font-size:11.5px;line-height:1.25;font-weight:700;color:#cfe0d5}
+.v-c .cta{margin-top:18px}
+.trust{margin-top:12px;text-align:center;font-size:13px;font-weight:700;color:#a9bbb0}
+.next{margin-top:22px;padding:16px 14px;border-radius:16px;background:rgba(18,35,26,.7);border:1px solid rgba(120,220,160,.16)}
+.next h2{font-size:13px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#8af0ad;margin-bottom:12px}
+.tip{margin-top:12px;font-size:13px;line-height:1.45;color:#a9bbb0}
+a:focus{outline:3px solid #8af0ad;outline-offset:3px}
+@media (max-width:360px){h1{font-size:30px}.v-c h1{font-size:27px}.offer b{font-size:19px}.offer span{font-size:10.5px}}
+@media (prefers-reduced-motion:reduce){.anim .cta:after{-webkit-animation:none;animation:none}.stk{transition:none}}
 </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <div class="avatar" id="hAvatar" aria-hidden="true"></div>
-    <div class="who"><b id="bizName">10Sports</b><span id="status">Online · ~1 min mein reply</span></div>
-    <a class="hbtn" id="callBtn" aria-label="Call us" hidden>
-      <svg aria-hidden="true" focusable="false" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.4 1.8.7 2.7a2 2 0 01-.5 2.1L8 9.8a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.4c.9.3 1.8.6 2.7.7a2 2 0 011.7 2z"/></svg>
-    </a>
-    <a class="getid" id="headerCta" href="https://10sports.cricket/register/?c=IY2tQoO3b" target="_blank" rel="noopener" aria-label="Get ID on WhatsApp (opens WhatsApp)">
-      <svg aria-hidden="true" focusable="false" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18.2a8.2 8.2 0 01-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1112 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 01-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 00-.7.3 3 3 0 00-.9 2.2 5.2 5.2 0 001.1 2.7 11.8 11.8 0 004.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 001.8-1.2 2.2 2.2 0 00.1-1.2c0-.1-.2-.2-.5-.3z"/></svg>
-      Get ID
-    </a>
-  </header>
+<!-- ========== Version B: the current 10sportss.com page, unchanged ========== -->
+<div class="w b-only">
+  <div class="brand fx"><span class="logo" aria-hidden="true"></span>10Sports<small>18+ only</small></div>
+  <h1>Get your 10Sports ID in 2&nbsp;minutes</h1>
+  <p class="sub">Sign up in a few quick steps. Works on any phone.</p>
+  <a class="cta js-cta" id="ctaB" data-b="b_main" href="https://10sports.cricket/register/?c=IY2tQoO3b"><strong>Get my ID now</strong><span>Free sign-up, takes about 2 minutes</span></a>
+  <p class="ticks"><span>Free</span><span>2 minutes</span><span>Any phone</span></p>
+  <ol class="b-steps">
+    <li>Tap &ldquo;Get my ID now&rdquo;</li>
+    <li>Enter your 10-digit mobile number</li>
+    <li>Verify with the OTP on SMS or WhatsApp</li>
+  </ol>
+  <p class="rg">Please play responsibly.</p>
+</div>
+<a class="stk js-cta b-only" id="stk" data-b="b_sticky" href="https://10sports.cricket/register/?c=IY2tQoO3b" aria-hidden="true" tabindex="-1">Get my ID now</a>
 
-  <div class="offer" id="offerBar">
-    <span aria-hidden="true">🎁</span><p id="offerText"><b>Pehle deposit par welcome bonus</b></p>
-    <button type="button" id="offerBtn">Claim Karo</button>
+<!-- ========== Version C ========== -->
+<div class="w c-only">
+  <div class="brand fx"><span class="logo" aria-hidden="true"></span>10Sports<small>18+ only</small></div>
+  <div class="match" id="match"></div>
+  <h1 id="cH">Get your 10Sports ID in 2&nbsp;minutes</h1>
+  <p class="sub" id="cS">Free sign-up with your mobile number. Deposit from &#8377;300 with 4% extra.</p>
+  <div class="offers fx">
+    <div class="offer"><b>4%</b><span>extra on every deposit</span></div>
+    <div class="offer"><b>10%</b><span>weekly lossback</span></div>
+    <div class="offer"><b>5%</b><span>refer &amp; earn</span></div>
   </div>
-
-  <main id="chat" aria-live="polite" aria-relevant="additions" aria-label="Chat">
-    <div class="notice">
-      <svg aria-hidden="true" focusable="false" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
-      <span>Aapke messages <span class="bn">10Sports</span> ke saath private hain.</span>
-    </div>
-  </main>
-
-  <div class="go" id="goOverlay" role="status" aria-live="assertive" hidden>
-    <div class="go-card"><b>⏱️ 2 minute mein apni ID banayein</b><span id="goSub"></span><div class="go-bar"><i></i></div></div>
+  <a class="cta js-cta" id="ctaC" data-b="c_main" href="https://10sports.cricket/register/?c=IY2tQoO3b"><strong>Get my ID now</strong><span>Free &middot; takes about 2 minutes</span></a>
+  <p class="trust">&#128274;&nbsp; Official 10Sports sign-up &middot; Min deposit just &#8377;300</p>
+  <div class="next">
+    <h2>What happens next</h2>
+    <ol>
+      <li>Enter your 10-digit mobile number</li>
+      <li>Type the OTP you get on SMS or WhatsApp</li>
+      <li>Your ID is ready. Deposit from &#8377;300 and get 4% extra.</li>
+    </ol>
+    <p class="tip">The OTP can take up to a minute. Keep the sign-up page open until it arrives.</p>
   </div>
-
-  <footer>
-    <a class="main-cta" id="mainCta" href="https://10sports.cricket/register/?c=IY2tQoO3b">
-      GET YOUR ID NOW
-      <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-    </a>
-    <div class="rg" id="rgLine">Sirf 18+ ke liye · Zimmedari se khelein</div>
-    <div class="composer">
-      <label class="sr" for="msgInput">Message</label>
-      <input class="field" id="msgInput" placeholder="Type a message..." autocomplete="off" enterkeyhint="send">
-      <button type="button" class="send" id="sendBtn" aria-label="Bhejein">
-        <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4l17.4-7.5a1 1 0 000-1.8L3.4 3.6a1 1 0 00-1.4 1.2L4.5 12l-2.5 7.2a1 1 0 001.4 1.2z"/></svg>
-      </button>
-    </div>
-  </footer>
+  <p class="rg">18+ only &middot; Please play responsibly.</p>
 </div>
 
 <script>
-/* =====================================================================
-   BRANDS — add one entry per brand you're authorised to promote.
-   This build is for 10Sports only.
-   ===================================================================== */
-const BRANDS = {
-  "10sports": {
-    name: "10Sports",
-    initials: "10",
-    logo: "data:image/jpeg;base64,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", // 10Sports logo, inlined (96×96 JPEG, ~2.7 KB)
-    color: "#008069",               // header colour (WhatsApp green)
-    whatsapp: "910000000000",       // digits only, with country code
-    phone: "",                      // optional; shows a call button
-    signupUrl: "https://10sports.cricket/register/?c=IY2tQoO3b", // website for all chat buttons; empty = WhatsApp
-    offer: "Pehle deposit par welcome bonus",
-    bonusDetails: "Naye users ko pehle deposit par welcome bonus milta hai. Exact amount aur terms website par diye gaye hain.",
-    payments: "UPI, bank transfer aur doosre local tareekon se deposit aur withdraw karein. Withdrawal hamari team 24×7 process karti hai."
+(function () {
+  var d = document, w = window, search = location.search.substring(1);
+  // Stats and pixel only on the live domain, so previews and tests don't count.
+  var LIVE = /(^|\.)10sportss\.com$|^10sports\.walink\.dev$/.test(location.hostname);
+  function qp(k) {
+    var m = new RegExp("(?:^|&)" + k + "=([^&]*)").exec(search);
+    try { return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : null; } catch (e) { return null; }
   }
-};
-const DEFAULT_BRAND = "10sports";
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
-/* Optional: POST each lead (name, phone, brand, source) to your CRM / Google
-   Apps Script / Zapier webhook. Leave empty to skip. */
-const LEAD_WEBHOOK = "";
-const MIN_AGE = 18;
-/* A message the visitor types is added to the signup link under this name,
-   e.g. https://10sports.cricket/register/?c=…&msg=Hi+I+want+an+ID  ("" = don't attach). */
-const MESSAGE_PARAM = "msg";
-/* Meta (Facebook) Pixel for this brand. "" = off. */
-const META_PIXEL_ID = "1585304069368231";       // PageView + Lead (on sign-up taps) + chat events
-/* ===================================================================== */
-
-const params = new URLSearchParams(location.search);
-const brandKey = (params.get("brand") || DEFAULT_BRAND).toLowerCase();
-const B = BRANDS[brandKey] || BRANDS[DEFAULT_BRAND];
-const SOURCE = params.get("utm_source") || params.get("src") || "";
-
-const $ = id => document.getElementById(id);
-const chat = $("chat"), input = $("msgInput"), sendBtn = $("sendBtn");
-const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-const KEY = "chat:" + brandKey + ":";
-const store = {
-  get(k, d) { try { var v = JSON.parse(localStorage.getItem(KEY + k)); return v == null ? d : v; } catch (e) { return d; } },
-  set(k, v) { try { localStorage.setItem(KEY + k, JSON.stringify(v)); } catch (e) {} }
-};
-
-/* ---------- Brand setup ---------- */
-document.documentElement.style.setProperty("--header", B.color);
-document.title = B.name + " — Apni ID paayein";
-$("bizName").textContent = B.name;
-$("hAvatar").innerHTML = B.logo ? `<img src="${esc(B.logo)}" alt="">` : esc(B.initials);
-document.querySelectorAll(".bn").forEach(el => el.textContent = B.name);
-$("offerText").innerHTML = `<b>${esc(B.offer)}</b>`;
-$("rgLine").textContent = `Sirf ${MIN_AGE}+ ke liye · Zimmedari se khelein`;
-if (B.phone) { $("callBtn").hidden = false; $("callBtn").href = "tel:" + B.phone; }
-
-const lead = store.get("lead", {});
-
-function waLink(intent) {
-  const parts = [`Hi ${B.name}, ${intent}`];
-  if (lead.name) parts.push(`Name: ${lead.name}`);
-  if (lead.phone) parts.push(`Number: ${lead.phone}`);
-  return `https://wa.me/${B.whatsapp}?text=${encodeURIComponent(parts.join("\n"))}`;
-}
-// Header "Get ID": goes to the brand's website when signupUrl is set, otherwise to WhatsApp.
-// UTM / src params from this page are passed through so attribution survives the jump.
-function siteLink(msg) {
-  const url = new URL(B.signupUrl, location.href);
-  for (const [k, v] of params) if (/^(utm_|src$|gclid$|fbclid$)/.test(k) && !url.searchParams.has(k)) url.searchParams.set(k, v);
-  if (msg && MESSAGE_PARAM) url.searchParams.set(MESSAGE_PARAM, msg.slice(0, 500));
-  return url.href;
-}
-const headerCta = $("headerCta");
-if (B.signupUrl) {
-  headerCta.removeAttribute("target");
-  headerCta.setAttribute("aria-label", `Get ID on the ${B.name} website`);
-  headerCta.querySelector("svg").innerHTML = '<path d="M14 3h7v7h-2V6.4l-9.3 9.3-1.4-1.4L17.6 5H14V3zM5 5h6v2H5v12h12v-6h2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>';
-}
-let going = false;
-function goToSite(from, msg) {
-  if (going) return;
-  going = true;
-  track("website_click", { from: from, has_message: !!msg });
-  if (msg) sendToWebhook({ type: "message", message: msg });
-  $("goSub").textContent = `${B.name} par le ja rahe hain…`;
-  $("goOverlay").hidden = false;
-  setTimeout(() => { location.href = siteLink(msg); }, 900);
-}
-// Back/forward cache: clear the overlay if the visitor comes back to this page.
-addEventListener("pageshow", () => { going = false; $("goOverlay").hidden = true; });
-function siteClick(el, from) {
-  el.addEventListener("click", e => { if (!B.signupUrl) return; e.preventDefault(); goToSite(from); });
-}
-
-const mainCta = $("mainCta");
-siteClick(mainCta, "main_cta");
-if (!B.signupUrl) mainCta.addEventListener("click", () => track("whatsapp_click", { from: "main_cta" }));
-if (!B.signupUrl) { mainCta.target = "_blank"; mainCta.rel = "noopener"; }
-function refreshHeaderCta() {
-  mainCta.href = B.signupUrl ? siteLink() : waLink("I want a new ID.");
-  headerCta.href = B.signupUrl ? siteLink() : waLink("I want a new ID."); }
-refreshHeaderCta();
-siteClick(headerCta, "header");
-if (!B.signupUrl) headerCta.addEventListener("click", () => track("whatsapp_click", { from: "header" }));
-
-/* ---------- Rendering ---------- */
-let lastFrom = null;
-function bubble(from, text) {
-  const row = document.createElement("div");
-  row.className = "row " + from + (from === "in" && lastFrom === "in" ? " cont" : "");
-  row.innerHTML = (from === "in" ? `<div class="avatar" aria-hidden="true">${B.logo ? `<img src="${esc(B.logo)}" alt="">` : esc(B.initials)}</div>` : "") +
-    `<div class="bubble">${esc(text)}<div class="meta">${now()}${from === "out" ? '<svg aria-hidden="true" focusable="false" class="ticks" width="15" height="10" viewBox="0 0 16 11" fill="currentColor"><path d="M11 .6l-6.6 7L1.7 5 .6 6.1 4.4 10 12.1 1.7zM15 .6l-6.6 7-.9-.9-1.1 1.1L8.4 10l7.7-8.3z"/></svg>' : ""}</div></div>`;
-  chat.appendChild(row);
-  lastFrom = from;
-  scroll();
-}
-function scroll() { chat.scrollTop = chat.scrollHeight; }
-function clearChips() { chat.querySelectorAll(".chips").forEach(c => c.remove()); }
-function chips(list) {
-  clearChips();
-  const wrap = document.createElement("div");
-  wrap.className = "chips";
-  list.forEach(([label, fn]) => {
-    const b = document.createElement("button");
-    b.type = "button"; b.className = "chip"; b.textContent = label;
-    b.onclick = () => { clearChips(); bubble("out", label); B.signupUrl ? goToSite("chip") : fn(); };
-    wrap.appendChild(b);
-  });
-  chat.appendChild(wrap); scroll();
-}
-function cta(label, intent, siteLabel) {
-  if (B.signupUrl) return siteCta(siteLabel || label);
-  const a = document.createElement("a");
-  a.className = "cta"; a.target = "_blank"; a.rel = "noopener";
-  a.href = waLink(intent);
-  a.innerHTML = `<svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2z"/></svg>${esc(label)}`;
-  a.onclick = () => track("whatsapp_click", { from: "chat", intent });
-  chat.appendChild(a); lastFrom = null; scroll();
-}
-function siteCta(label) {
-  const a = document.createElement("a");
-  a.className = "cta"; a.href = siteLink();
-  a.innerHTML = `<svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h7v7h-2V6.4l-9.3 9.3-1.4-1.4L17.6 5H14V3zM5 5h6v2H5v12h12v-6h2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>${esc(label)}`;
-  siteClick(a, "chat");
-  chat.appendChild(a); lastFrom = null; scroll();
-}
-
-// Bot speaks with a short typing delay — feels human, keeps attention.
-let queue = Promise.resolve();
-function say(...msgs) {
-  msgs.forEach(m => {
-    queue = queue.then(() => new Promise(res => {
-      $("status").textContent = "typing…";
-      const t = document.createElement("div");
-      t.className = "row in typing" + (lastFrom === "in" ? " cont" : "");
-      t.innerHTML = `<div class="avatar" aria-hidden="true">${B.logo ? `<img src="${esc(B.logo)}" alt="">` : esc(B.initials)}</div><div class="bubble"><i></i><i></i><i></i></div>`;
-      chat.appendChild(t); scroll();
-      const delay = typeof m === "string" ? Math.min(400 + m.length * 12, 1300) : 250;
-      setTimeout(() => {
-        t.remove(); $("status").textContent = "Online · ~1 min mein reply";
-        typeof m === "string" ? bubble("in", m) : m();
-        res();
-      }, delay);
-    }));
-  });
-  return queue;
-}
-
-/* ---------- Funnel ---------- */
-let expecting = null;  // "name" | "phone" | null
-
-function menu() {
-  say(() => chips([
-    ["🆔 Nayi ID banayein", startSignup],
-    ["🎁 Welcome bonus", bonus],
-    ["💳 Deposit / Withdrawal", payments],
-    ["💬 Agent se baat karein", agent]
-  ]));
-}
-function start() {
-  if (lead.done) {
-    say(`Wapas swagat hai${lead.name ? ", " + lead.name : ""}! 👋`,
-        B.signupUrl ? "Apni ID banana poora karne ke liye neeche tap karein." : "Your request is already with our team. Tap below to continue on WhatsApp.",
-        () => cta("Continue on WhatsApp", "I already requested an ID and want to continue.", "Abhi meri ID banao"));
-    menu();
-    return;
+  // ---- Version C: today's matches + the headline that matches the ad ----
+  var hk = "id";
+  if (AB === "c") {
+    var now = new Date(), pad = function (n) { return (n < 10 ? "0" : "") + n; },
+        today = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()), todays = [];
+    for (var i = 0; i < MATCHES.length && todays.length < 2; i++) if (MATCHES[i].d === today) todays.push(MATCHES[i]);
+    if (todays.length) {
+      var html = "";
+      for (var k = 0; k < todays.length; k++)
+        html += "<p>" + (k === 0 ? '<span class="live">TODAY</span>' : "") + esc(todays[k].t) +
+                "<em>" + esc(todays[k].time) + (todays[k].tour ? " &middot; " + esc(todays[k].tour) : "") + "</em></p>";
+      var mEl = d.getElementById("match"); mEl.innerHTML = html; mEl.className = "match on";
+    }
+    var want = (qp("v") || "id").toLowerCase();
+    if (want === "match" && !todays.length) want = "offer";
+    if (HEADLINES[want]) hk = want;
+    if (hk !== "id") {
+      var H = HEADLINES[hk];
+      d.getElementById("cH").innerHTML = H.h.replace("{t}", todays.length ? esc(todays[0].t) : "");
+      d.getElementById("cS").innerHTML = H.s;
+      d.title = d.getElementById("cH").textContent;
+    }
   }
-  bubble("in", `👋 ${B.name} mein aapka swagat hai!`);
-  bubble("in", "2 minute se kam mein apni ID paayein. Aap kya karna chahenge?");
-  chips([
-    ["🆔 Nayi ID banayein", startSignup],
-    ["🎁 Welcome bonus", bonus],
-    ["💳 Deposit / Withdrawal", payments],
-    ["💬 Agent se baat karein", agent]
-  ]);
-}
-function startSignup() {
-  track("signup_start");
-  if (lead.name) return askPhone();
-  expecting = "name";
-  say("Badhiya! 🙌 Aapka naam kya hai?");
-  input.placeholder = "Your name"; input.autocomplete = "given-name"; input.focus();
-}
-function askPhone() {
-  expecting = "phone";
-  say(`Shukriya ${lead.name}! 📱 Aapka WhatsApp number kya hai?` + (B.signupUrl ? " Zaroorat padne par hamari team aapse wahan sampark karegi." : " We'll send your ID there."));
-  input.placeholder = "WhatsApp number"; input.type = "tel"; input.inputMode = "tel"; input.autocomplete = "tel"; input.focus();
-}
-function askAge() {
-  expecting = null; resetInput();
-  say(`Bas ek aakhri baat — confirm karein ki aapki umar ${MIN_AGE} ya usse zyada hai.`, () => chips([
-    [`✅ Haan, main ${MIN_AGE}+ hoon`, finish],
-    [`Nahi, main ${MIN_AGE} se kam hoon`, underage]
-  ]));
-}
-function finish() {
-  lead.age = true; lead.done = true; store.set("lead", lead);
-  sendLead();
-  refreshHeaderCta();
-  say(`✅ Sab set hai, ${lead.name}!`,
-      B.signupUrl ? "Apni ID banane ke liye neeche button par tap karein — bas ek minute lagega." : "Tap the button below. Our agent is online and will create your ID right away on WhatsApp.",
-      () => cta("Get my ID on WhatsApp", "I want a new ID.", "Abhi meri ID banao"));
-  say(() => chips([["🎁 Welcome bonus", bonus], ["💳 Deposit / Withdrawal", payments]]));
-}
-function underage() {
-  say(`Maaf kijiye, ${B.name} sirf ${MIN_AGE} saal ya usse zyada umar walon ke liye hai. Aane ke liye shukriya.`);
-  track("underage");
-}
-function bonus() {
-  track("bonus_view");
-  say(`🎁 ${B.bonusDetails}`, () => chips(lead.done
-    ? [["💬 Bonus ke baare mein poochein", () => { say(() => cta("Ask on WhatsApp", "I want to know about the welcome bonus.", "Bonus details dekhein")); }]]
-    : [["🆔 ID banao aur claim karo", startSignup], ["💬 Agent se baat karein", agent]]));
-}
-function payments() {
-  say(`💳 ${B.payments}`, () => chips(lead.done
-    ? [["💬 Agent se baat karein", agent]]
-    : [["🆔 Nayi ID banayein", startSignup], ["💬 Agent se baat karein", agent]]));
-}
-function agent() {
-  track("agent_request");
-  say(B.signupUrl ? `Hamari team ${B.name} website par aapki madad karegi 👇` : "Our agents are available 24×7 on WhatsApp 👇",
-      () => cta("Chat with an agent", "I need help from an agent.", `${B.name} par jaayein`));
-  if (!lead.done) say(() => chips([["🆔 Nayi ID banayein", startSignup]]));
-}
 
-/* ---------- Free text ---------- */
-function resetInput() { input.type = "text"; input.inputMode = "text"; input.autocomplete = "off"; input.placeholder = "Type a message..."; }
-function handleText(text) {
-  bubble("out", text);
-  clearChips();
-  // Every typed message goes to the signup site, carrying the message with it.
-  if (B.signupUrl) return goToSite("typed", text);
-  if (expecting === "name") {
-    // Latin + accented + Devanagari letters (no \p{L}: older phones can't parse it)
-    const name = text.replace(/[^A-Za-z\u00C0-\u024F\u0900-\u097F\s.'-]/g, "").trim().slice(0, 40);
-    if (name.length < 2) return say("Kripya apna naam likhein 🙂");
-    lead.name = name.replace(/(^|\s)([a-z])/g, (m, sp, c) => sp + c.toUpperCase());
-    store.set("lead", lead);
-    return askPhone();
+  function beacon(u) {
+    try { if (w.fetch) { w.fetch(u, { mode: "no-cors", keepalive: true, credentials: "include" })["catch"](function () {}); return; } } catch (e) {}
+    new Image().src = u;
   }
-  if (expecting === "phone") {
-    const digits = text.replace(/\D/g, "");
-    if (digits.length < 10 || digits.length > 13) return say("Yeh sahi nahi lag raha. Kripya 10 digit ka mobile number daalein.");
-    lead.phone = digits;
-    store.set("lead", lead);
-    return askAge();
+  function pixel(ev) {
+    if (!LIVE || !META_PIXEL_ID) return;
+    try {
+      var t = new Date().getTime(), enc = encodeURIComponent,
+          fbp = (d.cookie.match(/(?:^|; )_fbp=([^;]+)/) || [])[1];
+      if (!fbp) { fbp = "fb.1." + t + "." + Math.floor(Math.random() * 1e10); d.cookie = "_fbp=" + fbp + "; max-age=7776000; path=/; SameSite=Lax"; }
+      var u = "https://www.facebook.com/tr/?id=" + META_PIXEL_ID + "&ev=" + ev + "&dl=" + enc(location.href) +
+              "&rl=" + enc(d.referrer) + "&ts=" + t + "&fbp=" + enc(fbp) +
+              "&eid=" + ev.toLowerCase() + "." + t + "." + Math.random().toString(36).slice(2, 10);
+      var fbclid = qp("fbclid");
+      if (fbclid) u += "&fbc=" + enc("fb.1." + t + "." + fbclid);
+      beacon(u);
+    } catch (e) {}
   }
-  // Unscripted message: route intent if obvious, otherwise hand to an agent.
-  const t = text.toLowerCase();
-  if (/\b(id|account|register|sign ?up|join|new)\b/.test(t) && !lead.done) return startSignup();
-  if (/bonus|offer|promo|free/.test(t)) return bonus();
-  if (/deposit|withdraw|upi|payment|pay|bank/.test(t)) return payments();
-  say(B.signupUrl ? `Samajh gaye! Hamari team ${B.name} website par is mein aapki madad karegi 👇` : "Got it! An agent can help you with that on WhatsApp right now 👇",
-      () => cta("Continue on WhatsApp", text, `${B.name} par jaayein`));
-  if (!lead.done) say(() => chips([["🆔 Nayi ID banayein", startSignup], ["🎁 Welcome bonus", bonus]]));
-}
-function send() {
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = "";
-  handleText(text);
-}
-sendBtn.onclick = send;
-input.addEventListener("keydown", e => { if (e.key === "Enter") send(); });
-$("offerBtn").onclick = () => {
-  if (B.signupUrl) return goToSite("offer");
-  clearChips(); bubble("out", "🎁 Welcome bonus claim karo"); lead.done ? bonus() : startSignup();
-};
+  // First-party stats (walink-stats). v = version; for C, b also carries which headline was shown.
+  function hit(e, b) {
+    if (!LIVE) return;
+    try {
+      var body = JSON.stringify({ e: e, b: b || null, v: AB, r: d.referrer || null, fb: qp("fbclid") ? 1 : 0,
+        us: qp("utm_source"), um: qp("utm_medium"), uc: qp("utm_campaign"), ut: qp("utm_content") });
+      if (navigator.sendBeacon && navigator.sendBeacon(STATS_URL, new Blob([body], { type: "text/plain" }))) return;
+      if (w.fetch) w.fetch(STATS_URL, { method: "POST", body: body, keepalive: true, headers: { "Content-Type": "text/plain" } })["catch"](function () {});
+    } catch (err) {}
+  }
 
-/* ---------- Leads & tracking ---------- */
-function sendLead() {
-  track("lead", { name: lead.name, phone: lead.phone });
-  sendToWebhook({ type: "lead", name: lead.name, phone: lead.phone });
-}
-function sendToWebhook(data) {
-  if (!LEAD_WEBHOOK) return;
-  const body = JSON.stringify(Object.assign({ brand: B.name, source: SOURCE, page: location.href, ts: new Date().toISOString() }, data));
-  // sendBeacon survives the page navigating away; fetch keepalive as a fallback.
-  try { if (navigator.sendBeacon && navigator.sendBeacon(LEAD_WEBHOOK, new Blob([body], { type: "text/plain" }))) return; } catch (e) {}
-  try { fetch(LEAD_WEBHOOK, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "text/plain" }, body: body }); } catch (e) {}
-}
-// Fires to Google Tag Manager / Meta Pixel if present on the page.
-function track(event, data = {}) {
-  const payload = Object.assign({ event: "chat_" + event, brand: brandKey, source: SOURCE }, data);
-  try { (window.dataLayer = window.dataLayer || []).push(payload); } catch (e) {}
-  try { if (window.fbq) fbq("trackCustom", "chat_" + event, { brand: brandKey }); if (window.fbq && (event === "lead" || event === "website_click")) fbq("track", "Lead"); } catch (e) {}
-}
+  // Pass ad attribution (utm_*, src, gclid, fbclid) through to the sign-up page.
+  var href = AB === "c" ? SIGNUP_URL_C : SIGNUP_URL_B, pairs = search ? search.split("&") : [];
+  for (var p = 0; p < pairs.length; p++) {
+    var key = pairs[p].split("=")[0];
+    if (/^(utm_[a-z]+|src|gclid|fbclid)$/.test(key) && href.indexOf("?" + key + "=") < 0 && href.indexOf("&" + key + "=") < 0)
+      href += (href.indexOf("?") < 0 ? "?" : "&") + pairs[p];
+  }
+  var links = d.querySelectorAll(".js-cta");
+  for (var j = 0; j < links.length; j++) (function (l) {
+    l.href = href;
+    l.addEventListener("click", function () {      // the link opens at once; nothing waits for tracking
+      var b = l.getAttribute("data-b");
+      hit("tap", AB === "c" ? b + "_" + hk : b);
+      try { (w.dataLayer = w.dataLayer || []).push({ event: "signup_click", variant: AB, headline: hk }); } catch (e) {}
+      pixel("Lead");
+    });
+  })(links[j]);
 
-if (META_PIXEL_ID) {
-  !function (f, n) { if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = []; }(window);
-  fbq("init", META_PIXEL_ID);
-  fbq("track", "PageView");
-  const loadPixel = () => { const t = document.createElement("script"); t.async = true; t.src = "https://connect.facebook.net/en_US/fbevents.js"; document.head.appendChild(t); };
-  if (document.readyState === "complete") loadPixel(); else addEventListener("load", loadPixel);
-}
+  // Version B only: sticky bottom button when the main button is off screen.
+  if (AB === "b") {
+    var stk = d.getElementById("stk"), ctaB = d.getElementById("ctaB");
+    if (w.IntersectionObserver) new IntersectionObserver(function (en) {
+      stk.className = en[0].isIntersecting ? "stk js-cta b-only" : "stk js-cta b-only show";
+    }).observe(ctaB);
+    else stk.className = "stk js-cta b-only show";
+  }
 
-track("open");
-start();
+  // Tracking after first paint, so it never competes with the page on slow 3G.
+  function after() { pixel("PageView"); hit("view", AB === "c" ? "h_" + hk : null); }
+  if (d.readyState === "complete") after(); else w.addEventListener("load", after);
+
+  // Button shine starts on first touch/scroll or 4 s after load (calm first paint).
+  var started = false;
+  function anim() { if (started) return; started = true; d.documentElement.className += " anim"; }
+  var evs = ["touchstart", "mousedown", "scroll", "keydown"];
+  for (var n = 0; n < evs.length; n++) w.addEventListener(evs[n], anim, true);
+  w.addEventListener("load", function () { setTimeout(anim, 4000); });
+})();
 </script>
 </body>
 </html>
