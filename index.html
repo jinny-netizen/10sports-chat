@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Get your 10Sports ID in 2 minutes</title>
-<meta name="description" content="Get your 10Sports ID in 2 minutes. Free sign-up with your mobile number and OTP.">
+<title>Get your 10Sports ID in 60 seconds</title>
+<meta name="description" content="Get your 10Sports ID in 60 seconds. Free sign-up with your mobile number and OTP.">
 <meta name="theme-color" content="#06110b">
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://10sports.cricket">
@@ -59,14 +59,14 @@ a:focus{outline:3px solid #8af0ad;outline-offset:3px}
 <div class="w">
   <div class="brand fx"><span class="logo"></span>10Sports<small>18+ only</small></div>
   <div class="match" id="match"></div>
-  <h1 id="h">Get your 10Sports ID in 2&nbsp;minutes</h1>
+  <h1 id="h">Get your 10Sports ID in 60&nbsp;seconds</h1>
   <p class="sub" id="s">Free sign-up with your mobile number. Deposit from &#8377;300 with 4% extra.</p>
   <div class="offers fx">
     <div class="offer"><b>4%</b><span>extra on every deposit</span></div>
     <div class="offer"><b>10%</b><span>weekly lossback</span></div>
     <div class="offer"><b>5%</b><span>refer &amp; earn</span></div>
   </div>
-  <a class="cta" id="cta" href="https://10sports.cricket/register/?c=RikJPxa3"><strong id="ct">Get my ID now</strong><span id="cs">Free &middot; takes about 2 minutes</span><i></i></a>
+  <a class="cta" id="cta" href="https://10sports.cricket/register/?c=RikJPxa3"><strong id="ct">Get my ID now</strong><span id="cs">Free &middot; takes about 60 seconds</span><i></i></a>
   <p class="wait" role="status">Opening the 10Sports sign-up page. On a slow network this can take a few seconds.</p>
   <p class="trust">Official 10Sports sign-up &middot; Min deposit just &#8377;300</p>
   <div class="next">
@@ -91,8 +91,8 @@ var META_PIXEL_ID = "1585304069368231";
 var STATS_URL = "https://newid.walink.dev/t";
 var MATCHES = [];
 var HEADLINES = {
-  offer: ["4% extra on every deposit + 10% weekly lossback", "Get your 10Sports ID in 2 minutes. Deposits start at just &#8377;300."],
-  match: ["{t} today. Get your ID before the toss.", "Free sign-up in 2 minutes. Deposit from &#8377;300 with 4% extra."]
+  offer: ["4% extra on every deposit + 10% weekly lossback", "Get your 10Sports ID in 60 seconds. Deposits start at just &#8377;300."],
+  match: ["{t} today. Get your ID before the toss.", "Free sign-up in 60 seconds. Deposit from &#8377;300 with 4% extra."]
 };
 (function () {
   var d = document, w = window, q = location.search.substring(1), hk = "id";
@@ -165,7 +165,7 @@ var HEADLINES = {
   w.addEventListener("pageshow", function () {
     root.className = root.className.replace(/ ?go/g, "");
     d.getElementById("ct").innerHTML = "Get my ID now";
-    d.getElementById("cs").innerHTML = "Free &middot; takes about 2 minutes";
+    d.getElementById("cs").innerHTML = "Free &middot; takes about 60 seconds";
   });
 
   function after() { pixel("PageView"); hit("view", "h_" + hk); }
