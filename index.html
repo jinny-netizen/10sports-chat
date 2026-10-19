@@ -96,7 +96,7 @@ var HEADLINES = {
 };
 (function () {
   var d = document, w = window, q = location.search.substring(1), hk = "id";
-  var LIVE = /^10s(ports|p)\.walink\.dev$/.test(location.hostname);
+  var LIVE = /^10sp\.walink\.dev$/.test(location.hostname);
   function qp(k) { var m = new RegExp("(?:^|&)" + k + "=([^&]*)").exec(q); try { return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : null; } catch (e) { return null; } }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
