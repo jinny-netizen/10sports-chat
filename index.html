@@ -3,137 +3,72 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<script>
-/* ============================ SETTINGS ============================
-   SIGNUP_URL_B / SIGNUP_URL_C: where each version's button goes. Give C its OWN referral code
-     so the back-office can count C's sign-ups and FTDs separately (until then both use B's code).
-   SPLIT_C: share of new visitors who see version C (0.5 = 50/50). A visitor keeps their version.
-     ?ab=b or ?ab=c in the URL forces one version (for checking).
-   MATCHES: today's fixtures for the match strip. One line per match; only matches dated today show
-     (at most 2). Empty = no strip, and ?v=match ads fall back to the offer headline.
-       { d: "2026-10-19", t: "IND vs AUS", time: "7:30 PM IST", tour: "1st ODI" }
-   Plain ES5 throughout, so it runs on 2016-era phone browsers. */
-var SIGNUP_URL_B = "https://10sports.club/register?c=RikJPxa3";
-var SIGNUP_URL_C = "https://10sports.club/register?c=RikJPxa3";
-var SPLIT_C = 1;   /* 10sports.walink.dev: version C for everyone */
-var META_PIXEL_ID = "1585304069368231";
-var STATS_URL = "https://newid.walink.dev/t";
-var MATCHES = [];
-/* Headline per ad: add ?v=offer, ?v=match or ?v=id to the ad's URL (no v = "id"). */
-var HEADLINES = {
-  id:    { h: "Get your 10Sports ID in 2&nbsp;minutes",          s: "Free sign-up with your mobile number. Deposit from &#8377;300 with 4% extra." },
-  offer: { h: "4% extra on every deposit + 10% weekly lossback", s: "Get your 10Sports ID in 2 minutes. Deposits start at just &#8377;300." },
-  match: { h: "{t} today. Get your ID before the toss.",         s: "Free sign-up in 2 minutes. Deposit from &#8377;300 with 4% extra." }
-};
-/* ================================================================== */
-var AB = (function () {
-  var v = null, m = /(?:^|[?&])ab=([bc])(?:&|$)/.exec(location.search);
-  if (m) v = m[1];
-  else {
-    try { v = localStorage.getItem("ab10s"); } catch (e) {}
-    if (v !== "b" && v !== "c") {
-      v = Math.random() < SPLIT_C ? "c" : "b";
-      try { localStorage.setItem("ab10s", v); } catch (e) {}
-    }
-  }
-  document.documentElement.className = "v-" + v;
-  return v;
-})();
-</script>
 <title>Get your 10Sports ID in 2 minutes</title>
 <meta name="description" content="Get your 10Sports ID in 2 minutes. Free sign-up with your mobile number and OTP.">
 <meta name="theme-color" content="#06110b">
 <meta name="format-detection" content="telephone=no">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ff8a1f'/%3E%3Ctext x='16' y='22' font-size='15' font-weight='900' text-anchor='middle' fill='%231c0a00' font-family='Arial'%3E10%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://10sports.club">
 <link rel="dns-prefetch" href="https://10sports.club">
+<link rel="icon" href="data:,">
 <style>
-/* 2016+ browsers: no CSS variables, no flex "gap"; spacing uses margins. */
 *{box-sizing:border-box;margin:0;padding:0}
-html{background:#06110b}
-body{min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#eef7f1;background:#06110b;background-image:radial-gradient(ellipse at 50% 0,rgba(37,211,102,.2),transparent 60%),radial-gradient(ellipse at 50% 100%,rgba(110,80,220,.2),transparent 60%);background-repeat:no-repeat;padding:20px 16px 32px;-webkit-text-size-adjust:100%}
-.v-b .c-only,.v-c .b-only{display:none!important}
-.v-b body{padding-bottom:100px}
+html,body{background:#06110b}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#eef7f1;background-image:radial-gradient(ellipse at 50% 0,rgba(37,211,102,.2),transparent 60%);background-repeat:no-repeat;padding:20px 16px 32px;-webkit-text-size-adjust:100%}
 .w{max-width:440px;margin:0 auto}
 .fx{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center}
 .brand{font-size:17px;font-weight:800}
 .logo{width:40px;height:40px;border-radius:12px;margin-right:10px;-webkit-flex-shrink:0;flex-shrink:0;background:#231f20 url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/wAARCABQAFADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9sAQwADAwMDAwMEAwMEBgQEBAYIBgYGBggKCAgICAgKDQoKCgoKCg0NDQ0NDQ0NDw8PDw8PEhISEhIUFBQUFBQUFBQU/9sAQwEDAwMFBQUJBQUJFQ4MDhUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUV/90ABAAF/9oADAMBAAIRAxEAPwD4CooooNQq9e6bf6b9l+3272/22BLuAOMF4JSdkij+620lT3HPSuv+F3gqX4i/EHw94MiLCPVbxUuGXqlumXnbPbbGrEH1xXvn7Z2l6dpvxQ0Z9GjWPTJ/DlktoqDCCKBpYkVfYKoApcyvy9R2dr2PkaiiimIKKKKACpIf9an+8P51HUkP+tT/AHh/OgD/0PgKiiig1PrX9jmyST4g+I9UABn0vwzfSweqvI0cZYe4Vj+den/tT+D7jxD8LfBPxI02Np/+EdWTSNS2jcYo3YGFzjoquNpP+2K+e/2ZfH2mfD74s6de67IsejazDLpN87HCxx3O0LIx7KJFXceykntX6Nmaf4d6jqXhnXrFNX8MawjK8Miho54HG3cu7Kk7TtZT1/I18vnGOeCxdLE1P4TXK32Z9HlOB+uYaph6dvaJ8yXdH4yUV+iniH9j/wAEeOLmfUPg/wCKRpUjku2kaojOsYPOI5B+8Cg8DIfH96vnTx7+yx8ZPh/ZS6rfaOmr6ZbqWkutKk+0CNRyWaPCyhQOSdpA7mvosPiKdaCqUpJp9VseDXo1KU3TqJprdPRnztRQCCMg5BorYyCpIf8AWp/vD+dR1JD/AK1P94fzoA//0fgKiiig1AgEHPINfpB+y/8AEvWdW+F/ja38fFfEHh/wRb2zWMU43XC+b5gEQmznaoVQufmXOAcAAfm/X1r+ynrNreXvjP4WXkywP450opYFyFU3trueJMnuys2PXbiscRT5qUo2TutnsdeDlGNeEptpJ6tb2P0Lf4e2d1ptj43+Gd85LRrd28TNuDqRu2q3UH+Eq2c8gkV2Z1yaxbRvEdpujsNYCrd2pztjkP3ioP3SDnI45HPWvh34ZfGPxT8Jr2fQ723a80tJmW40+UlZIJA2HMLH7rZ+8p+VuvB5r7F0bxz4H+Kegtp/hS9SDU43+1JYXOIphJuLMApOCpJPzKSBntXwbwVFUpzwHuT35V/Mu3qfe51l+MoVIrFrnp6pS393zPy9/ay8EaX4H+NGq2uiQLbWGr28OqJAgwkbz7llVVHAUurMAOBuwOK+a6/QP9ufwJrcusaD8UYbaQ6XNZR6befKc2s8bsyb/QOGKhum5cZ5Gfz8r9ApyUoqS6n5u1bRhUkP+tT/AHh/Oo6kh/1qf7w/nVAf/9L4CooooNQqzZ3d3p93b39hO9tdWsizQzRMVeORGDKysOQykAg1WooA+y9L+LXgT4rwQQfEmdfCXjJEER12OMtp9/gYVryNPmilOOZFBU9TgYA66X4ReP7C3j8Q+Glh8QWULCSHUNBulugCOQy+WRIpHXhcivgauh8M+LfFHgzUF1TwnrF3o12pB8y0kaPdjsyj5WHqGBB9K8vFZRRrSc3o+6PrMp4wxuDpqimpQXR9Efql8PPi3qPj/QtT+FfjEWj6/eWstvYz6nD5lvcyhTthu4SVJbI6ggsP9oDP5R+IbC90rXtU0zUbFdNu7K6lgntE3bIJI2KtGu4ltqkYXLE4xya+1PBPxs0P4xT2fh34krbeH/HCun9j+KLVRDHNcqQYor1V4UswADj5c9AvfyT9qjSprH4p/wBrXduLS78QaZZ395CBgLdhTBcgfWSInPfOa3wkakL06jvbZ90efm9TC12sTho8l949E/LyPm+pIf8AWp/vD+dR1JD/AK1P94fzrtPDP//T+AqKKKDUKKKKACiiigA/zxXrfxS8e3PxBsPA+o6nIZ9U0zQxpt5Kxy0jW9zKEdj1LNGVLE9Tk968kpScgA9qAEqSH/Wp/vD+dR1JD/rU/wB4fzoA/9k=) center/cover no-repeat}
 .brand small{margin-left:auto;font-size:12px;font-weight:700;color:#a9bbb0}
-h1{margin-top:22px;font-size:34px;line-height:1.08;letter-spacing:-.8px;font-weight:900}
-.sub{margin-top:10px;font-size:15.5px;line-height:1.5;color:#a9bbb0}
-.cta,.stk{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-orient:vertical;-webkit-flex-direction:column;flex-direction:column;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;background:#ff8a1f;color:#1c0a00;text-decoration:none;text-align:center;-webkit-tap-highlight-color:transparent}
-.cta{position:relative;overflow:hidden;margin-top:22px;min-height:74px;border-radius:18px;box-shadow:0 0 0 5px rgba(255,138,31,.16),0 12px 30px rgba(255,120,20,.3)}
-.cta strong{font-size:21px;font-weight:900}
-.cta span{margin-top:2px;font-size:13px;font-weight:700;color:#4a2300}
-.cta:after{content:"";position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);-webkit-transform:translateX(-150%) skewX(-20deg);transform:translateX(-150%) skewX(-20deg)}
-.anim .cta:after{-webkit-animation:shine 3.4s ease-in-out infinite;animation:shine 3.4s ease-in-out infinite}
-@-webkit-keyframes shine{0%{-webkit-transform:translateX(-150%) skewX(-20deg)}28%,100%{-webkit-transform:translateX(330%) skewX(-20deg)}}
-@keyframes shine{0%{transform:translateX(-150%) skewX(-20deg)}28%,100%{transform:translateX(330%) skewX(-20deg)}}
-.cta:active,.stk:active{opacity:.9}
-.ticks{margin-top:12px;text-align:center;font-size:13px;font-weight:700;color:#a9bbb0}
-.ticks span{display:inline-block;margin:0 7px}
-.ticks span:before{content:"\2713  ";color:#8af0ad}
-ol{list-style:none;counter-reset:s}
-li{counter-increment:s;position:relative;padding-left:40px;min-height:28px;line-height:1.35;padding-top:4px;font-size:15px;margin-top:12px}
-li:first-child{margin-top:0}
-li:before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;line-height:28px;border-radius:50%;text-align:center;background:rgba(126,224,165,.14);color:#8af0ad;font-size:14px;font-weight:800}
-.b-steps{margin-top:26px;padding-top:18px;border-top:1px solid rgba(120,220,160,.16)}
-.rg{margin-top:22px;text-align:center;font-size:11px;color:#a9bbb0}
-.stk{position:fixed;left:12px;right:12px;bottom:12px;z-index:20;min-height:58px;border-radius:16px;font-size:18px;font-weight:900;box-shadow:0 10px 30px rgba(0,0,0,.5);-webkit-transform:translateY(150%);transform:translateY(150%);-webkit-transition:-webkit-transform .25s;transition:transform .25s}
-.stk.show{-webkit-transform:none;transform:none}
-/* ---------- Version C ---------- */
 .match{display:none;margin-top:16px;padding:9px 12px;border-radius:12px;background:rgba(255,138,31,.1);border:1px solid rgba(255,138,31,.35);font-size:13.5px;font-weight:700}
-.match.on{display:block}
-.match p{margin-top:4px}
-.match p:first-child{margin-top:0}
-.live{display:inline-block;margin-right:8px;padding:2px 7px;border-radius:6px;background:#ff8a1f;color:#1c0a00;font-size:11px;font-weight:900;letter-spacing:.6px;vertical-align:1px}
+.match p+p{margin-top:4px}
+.live{display:inline-block;margin-right:8px;padding:2px 7px;border-radius:6px;background:#ff8a1f;color:#1c0a00;font-size:11px;font-weight:900}
 .match em{font-style:normal;color:#ffc48f;margin-left:6px}
-.v-c h1{margin-top:18px;font-size:31px}
+h1{margin-top:18px;font-size:31px;line-height:1.08;letter-spacing:-.8px;font-weight:900}
+.sub{margin-top:10px;font-size:15.5px;line-height:1.5;color:#a9bbb0}
 .offers{margin-top:18px;-webkit-box-align:stretch;-webkit-align-items:stretch;align-items:stretch}
 .offer{-webkit-box-flex:1;-webkit-flex:1 1 0;flex:1 1 0;min-width:0;margin-left:8px;padding:10px 4px 9px;border-radius:14px;background:#12231a;border:1px solid rgba(120,220,160,.16);text-align:center}
 .offer:first-child{margin-left:0}
 .offer b{display:block;font-size:22px;line-height:1;font-weight:900;color:#8af0ad}
 .offer span{display:block;margin-top:5px;font-size:11.5px;line-height:1.25;font-weight:700;color:#cfe0d5}
-.v-c .cta{margin-top:18px}
+.cta{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-orient:vertical;-webkit-flex-direction:column;flex-direction:column;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;position:relative;overflow:hidden;margin-top:18px;min-height:74px;border-radius:18px;background:#ff8a1f;color:#1c0a00;text-decoration:none;text-align:center;box-shadow:0 0 0 5px rgba(255,138,31,.16),0 12px 30px rgba(255,120,20,.3);-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.cta strong{font-size:21px;font-weight:900}
+.cta span{margin-top:2px;font-size:13px;font-weight:700;color:#4a2300}
+.cta:active{opacity:.9}
+.cta i{display:none;position:absolute;left:0;bottom:0;height:4px;width:100%;background:#1c0a00;opacity:.35;-webkit-transform-origin:0 0;transform-origin:0 0}
+.go .cta{background:#ffa552}
+.go .cta i{display:block;-webkit-animation:bar 12s cubic-bezier(.1,.7,.3,1) forwards;animation:bar 12s cubic-bezier(.1,.7,.3,1) forwards}
+.go .wait{display:block}
+@-webkit-keyframes bar{from{-webkit-transform:scaleX(0)}to{-webkit-transform:scaleX(.95)}}
+@keyframes bar{from{transform:scaleX(0)}to{transform:scaleX(.95)}}
+.wait{display:none;margin-top:10px;text-align:center;font-size:13px;line-height:1.4;color:#ffc48f}
 .trust{margin-top:12px;text-align:center;font-size:13px;font-weight:700;color:#a9bbb0}
-.next{margin-top:22px;padding:16px 14px;border-radius:16px;background:rgba(18,35,26,.7);border:1px solid rgba(120,220,160,.16)}
+.next{margin-top:22px;padding:16px 14px;border-radius:16px;background:#0e1d15;border:1px solid rgba(120,220,160,.16)}
 .next h2{font-size:13px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#8af0ad;margin-bottom:12px}
+ol{list-style:none;counter-reset:s}
+li{counter-increment:s;position:relative;padding:4px 0 0 40px;min-height:28px;line-height:1.35;font-size:15px}
+li+li{margin-top:12px}
+li:before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;line-height:28px;border-radius:50%;text-align:center;background:rgba(126,224,165,.14);color:#8af0ad;font-size:14px;font-weight:800}
 .tip{margin-top:12px;font-size:13px;line-height:1.45;color:#a9bbb0}
+.rg{margin-top:22px;text-align:center;font-size:11px;color:#a9bbb0}
 a:focus{outline:3px solid #8af0ad;outline-offset:3px}
-@media (max-width:360px){h1{font-size:30px}.v-c h1{font-size:27px}.offer b{font-size:19px}.offer span{font-size:10.5px}}
-@media (prefers-reduced-motion:reduce){.anim .cta:after{-webkit-animation:none;animation:none}.stk{transition:none}}
+@media (max-width:360px){h1{font-size:27px}.offer b{font-size:19px}.offer span{font-size:10.5px}}
+@media (prefers-reduced-motion:reduce){.go .cta i{-webkit-animation:none;animation:none;-webkit-transform:scaleX(.6);transform:scaleX(.6)}}
 </style>
 </head>
 <body>
-<!-- ========== Version B: the current 10sportss.com page, unchanged ========== -->
-<div class="w b-only">
-  <div class="brand fx"><span class="logo" aria-hidden="true"></span>10Sports<small>18+ only</small></div>
-  <h1>Get your 10Sports ID in 2&nbsp;minutes</h1>
-  <p class="sub">Sign up in a few quick steps. Works on any phone.</p>
-  <a class="cta js-cta" id="ctaB" data-b="b_main" href="https://10sports.club/register?c=RikJPxa3"><strong>Get my ID now</strong><span>Free sign-up, takes about 2 minutes</span></a>
-  <p class="ticks"><span>Free</span><span>2 minutes</span><span>Any phone</span></p>
-  <ol class="b-steps">
-    <li>Tap &ldquo;Get my ID now&rdquo;</li>
-    <li>Enter your 10-digit mobile number</li>
-    <li>Verify with the OTP on SMS or WhatsApp</li>
-  </ol>
-  <p class="rg">Please play responsibly.</p>
-</div>
-<a class="stk js-cta b-only" id="stk" data-b="b_sticky" href="https://10sports.club/register?c=RikJPxa3" aria-hidden="true" tabindex="-1">Get my ID now</a>
-
-<!-- ========== Version C ========== -->
-<div class="w c-only">
-  <div class="brand fx"><span class="logo" aria-hidden="true"></span>10Sports<small>18+ only</small></div>
+<div class="w">
+  <div class="brand fx"><span class="logo"></span>10Sports<small>18+ only</small></div>
   <div class="match" id="match"></div>
-  <h1 id="cH">Get your 10Sports ID in 2&nbsp;minutes</h1>
-  <p class="sub" id="cS">Free sign-up with your mobile number. Deposit from &#8377;300 with 4% extra.</p>
+  <h1 id="h">Get your 10Sports ID in 2&nbsp;minutes</h1>
+  <p class="sub" id="s">Free sign-up with your mobile number. Deposit from &#8377;300 with 4% extra.</p>
   <div class="offers fx">
     <div class="offer"><b>4%</b><span>extra on every deposit</span></div>
     <div class="offer"><b>10%</b><span>weekly lossback</span></div>
     <div class="offer"><b>5%</b><span>refer &amp; earn</span></div>
   </div>
-  <a class="cta js-cta" id="ctaC" data-b="c_main" href="https://10sports.club/register?c=RikJPxa3"><strong>Get my ID now</strong><span>Free &middot; takes about 2 minutes</span></a>
-  <p class="trust">&#128274;&nbsp; Official 10Sports sign-up &middot; Min deposit just &#8377;300</p>
+  <a class="cta" id="cta" href="https://10sports.club/register?c=RikJPxa3"><strong id="ct">Get my ID now</strong><span id="cs">Free &middot; takes about 2 minutes</span><i></i></a>
+  <p class="wait" role="status">Opening the 10Sports sign-up page. On a slow network this can take a few seconds.</p>
+  <p class="trust">Official 10Sports sign-up &middot; Min deposit just &#8377;300</p>
   <div class="next">
     <h2>What happens next</h2>
     <ol>
@@ -145,108 +80,96 @@ a:focus{outline:3px solid #8af0ad;outline-offset:3px}
   </div>
   <p class="rg">18+ only &middot; Please play responsibly.</p>
 </div>
-
 <script>
+/* SETTINGS (plain ES5, runs on 2016-era phones)
+   SIGNUP_URL: where the button goes (also in the button's href, so it works without JavaScript).
+   MATCHES: today's fixtures for the strip, e.g. {d:"2026-10-19", t:"IND vs AUS", time:"7:30 PM IST", tour:"1st ODI"}.
+     Only today's show (max 2). Empty = no strip; ?v=match ads then get the offer headline.
+   HEADLINES: picked by ?v= in the ad URL (no v = id). */
+var SIGNUP_URL = "https://10sports.club/register?c=RikJPxa3";
+var META_PIXEL_ID = "1585304069368231";
+var STATS_URL = "https://newid.walink.dev/t";
+var MATCHES = [];
+var HEADLINES = {
+  offer: ["4% extra on every deposit + 10% weekly lossback", "Get your 10Sports ID in 2 minutes. Deposits start at just &#8377;300."],
+  match: ["{t} today. Get your ID before the toss.", "Free sign-up in 2 minutes. Deposit from &#8377;300 with 4% extra."]
+};
 (function () {
-  var d = document, w = window, search = location.search.substring(1);
-  // Stats and pixel only on the live domain, so previews and tests don't count.
-  var LIVE = /(^|\.)10sportss\.com$|^10sports\.walink\.dev$/.test(location.hostname);
-  function qp(k) {
-    var m = new RegExp("(?:^|&)" + k + "=([^&]*)").exec(search);
-    try { return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : null; } catch (e) { return null; }
-  }
+  var d = document, w = window, q = location.search.substring(1), hk = "id";
+  var LIVE = /^10sports\.walink\.dev$/.test(location.hostname);
+  function qp(k) { var m = new RegExp("(?:^|&)" + k + "=([^&]*)").exec(q); try { return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : null; } catch (e) { return null; } }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
-  // ---- Version C: today's matches + the headline that matches the ad ----
-  var hk = "id";
-  if (AB === "c") {
-    var now = new Date(), pad = function (n) { return (n < 10 ? "0" : "") + n; },
-        today = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()), todays = [];
-    for (var i = 0; i < MATCHES.length && todays.length < 2; i++) if (MATCHES[i].d === today) todays.push(MATCHES[i]);
-    if (todays.length) {
-      var html = "";
-      for (var k = 0; k < todays.length; k++)
-        html += "<p>" + (k === 0 ? '<span class="live">TODAY</span>' : "") + esc(todays[k].t) +
-                "<em>" + esc(todays[k].time) + (todays[k].tour ? " &middot; " + esc(todays[k].tour) : "") + "</em></p>";
-      var mEl = d.getElementById("match"); mEl.innerHTML = html; mEl.className = "match on";
-    }
-    var want = (qp("v") || "id").toLowerCase();
-    if (want === "match" && !todays.length) want = "offer";
-    if (HEADLINES[want]) hk = want;
-    if (hk !== "id") {
-      var H = HEADLINES[hk];
-      d.getElementById("cH").innerHTML = H.h.replace("{t}", todays.length ? esc(todays[0].t) : "");
-      d.getElementById("cS").innerHTML = H.s;
-      d.title = d.getElementById("cH").textContent;
-    }
+  // Match strip + the headline that matches the ad.
+  var t = new Date(), p2 = function (n) { return (n < 10 ? "0" : "") + n; },
+      today = t.getFullYear() + "-" + p2(t.getMonth() + 1) + "-" + p2(t.getDate()), ms = [], i;
+  for (i = 0; i < MATCHES.length && ms.length < 2; i++) if (MATCHES[i].d === today) ms.push(MATCHES[i]);
+  if (ms.length) {
+    var html = "";
+    for (i = 0; i < ms.length; i++) html += "<p>" + (i ? "" : '<span class="live">TODAY</span>') + esc(ms[i].t) + "<em>" + esc(ms[i].time) + (ms[i].tour ? " &middot; " + esc(ms[i].tour) : "") + "</em></p>";
+    var me = d.getElementById("match"); me.innerHTML = html; me.style.display = "block";
+  }
+  var v = (qp("v") || "").toLowerCase();
+  if (v === "match" && !ms.length) v = "offer";
+  if (HEADLINES[v]) {
+    hk = v;
+    d.getElementById("h").innerHTML = HEADLINES[v][0].replace("{t}", ms.length ? esc(ms[0].t) : "");
+    d.getElementById("s").innerHTML = HEADLINES[v][1];
+    d.title = d.getElementById("h").textContent;
   }
 
-  function beacon(u) {
-    try { if (w.fetch) { w.fetch(u, { mode: "no-cors", keepalive: true, credentials: "include" })["catch"](function () {}); return; } } catch (e) {}
-    new Image().src = u;
+  // Tracking: tiny direct requests, never blocking the page or the tap.
+  function send(u, body) {
+    try {
+      if (body) { if (navigator.sendBeacon && navigator.sendBeacon(u, new Blob([body], { type: "text/plain" }))) return; if (w.fetch) { w.fetch(u, { method: "POST", body: body, keepalive: true })["catch"](function () {}); return; } }
+      else if (w.fetch) { w.fetch(u, { mode: "no-cors", keepalive: true, credentials: "include" })["catch"](function () {}); return; }
+      if (!body) new Image().src = u;
+    } catch (e) {}
   }
   function pixel(ev) {
     if (!LIVE || !META_PIXEL_ID) return;
     try {
-      var t = new Date().getTime(), enc = encodeURIComponent,
-          fbp = (d.cookie.match(/(?:^|; )_fbp=([^;]+)/) || [])[1];
-      if (!fbp) { fbp = "fb.1." + t + "." + Math.floor(Math.random() * 1e10); d.cookie = "_fbp=" + fbp + "; max-age=7776000; path=/; SameSite=Lax"; }
-      var u = "https://www.facebook.com/tr/?id=" + META_PIXEL_ID + "&ev=" + ev + "&dl=" + enc(location.href) +
-              "&rl=" + enc(d.referrer) + "&ts=" + t + "&fbp=" + enc(fbp) +
-              "&eid=" + ev.toLowerCase() + "." + t + "." + Math.random().toString(36).slice(2, 10);
-      var fbclid = qp("fbclid");
-      if (fbclid) u += "&fbc=" + enc("fb.1." + t + "." + fbclid);
-      beacon(u);
+      var n = new Date().getTime(), enc = encodeURIComponent, fbp = (d.cookie.match(/(?:^|; )_fbp=([^;]+)/) || [])[1], fc = qp("fbclid");
+      if (!fbp) { fbp = "fb.1." + n + "." + Math.floor(Math.random() * 1e10); d.cookie = "_fbp=" + fbp + "; max-age=7776000; path=/; SameSite=Lax"; }
+      send("https://www.facebook.com/tr/?id=" + META_PIXEL_ID + "&ev=" + ev + "&dl=" + enc(location.href) + "&rl=" + enc(d.referrer) +
+           "&ts=" + n + "&fbp=" + enc(fbp) + "&eid=" + ev.toLowerCase() + "." + n + "." + Math.random().toString(36).slice(2, 10) +
+           (fc ? "&fbc=" + enc("fb.1." + n + "." + fc) : ""));
     } catch (e) {}
   }
-  // First-party stats (walink-stats). v = version; for C, b also carries which headline was shown.
   function hit(e, b) {
     if (!LIVE) return;
-    try {
-      var body = JSON.stringify({ e: e, b: b || null, v: AB, r: d.referrer || null, fb: qp("fbclid") ? 1 : 0,
-        us: qp("utm_source"), um: qp("utm_medium"), uc: qp("utm_campaign"), ut: qp("utm_content") });
-      if (navigator.sendBeacon && navigator.sendBeacon(STATS_URL, new Blob([body], { type: "text/plain" }))) return;
-      if (w.fetch) w.fetch(STATS_URL, { method: "POST", body: body, keepalive: true, headers: { "Content-Type": "text/plain" } })["catch"](function () {});
-    } catch (err) {}
+    send(STATS_URL, JSON.stringify({ e: e, b: b, v: "c", r: d.referrer || null, fb: qp("fbclid") ? 1 : 0,
+      us: qp("utm_source"), um: qp("utm_medium"), uc: qp("utm_campaign"), ut: qp("utm_content") }));
   }
 
   // Pass ad attribution (utm_*, src, gclid, fbclid) through to the sign-up page.
-  var href = AB === "c" ? SIGNUP_URL_C : SIGNUP_URL_B, pairs = search ? search.split("&") : [];
-  for (var p = 0; p < pairs.length; p++) {
-    var key = pairs[p].split("=")[0];
-    if (/^(utm_[a-z]+|src|gclid|fbclid)$/.test(key) && href.indexOf("?" + key + "=") < 0 && href.indexOf("&" + key + "=") < 0)
-      href += (href.indexOf("?") < 0 ? "?" : "&") + pairs[p];
+  var href = SIGNUP_URL, pr = q ? q.split("&") : [];
+  for (i = 0; i < pr.length; i++) {
+    var k = pr[i].split("=")[0];
+    if (/^(utm_[a-z]+|src|gclid|fbclid)$/.test(k) && href.indexOf("?" + k + "=") < 0 && href.indexOf("&" + k + "=") < 0) href += (href.indexOf("?") < 0 ? "?" : "&") + pr[i];
   }
-  var links = d.querySelectorAll(".js-cta");
-  for (var j = 0; j < links.length; j++) (function (l) {
-    l.href = href;
-    l.addEventListener("click", function () {      // the link opens at once; nothing waits for tracking
-      var b = l.getAttribute("data-b");
-      hit("tap", AB === "c" ? b + "_" + hk : b);
-      try { (w.dataLayer = w.dataLayer || []).push({ event: "signup_click", variant: AB, headline: hk }); } catch (e) {}
+  var cta = d.getElementById("cta"), root = d.documentElement;
+  cta.href = href;
+  // Tap: the browser opens sign-up immediately (no waiting on tracking); the button shows progress
+  // so a slow sign-up page doesn't look like a dead button.
+  cta.addEventListener("click", function () {
+    if (root.className.indexOf("go") < 0) {
+      root.className += " go";
+      d.getElementById("ct").innerHTML = "Opening sign-up&hellip;";
+      d.getElementById("cs").innerHTML = "Please wait, don&rsquo;t tap again";
+      hit("tap", "c_main_" + hk);
       pixel("Lead");
-    });
-  })(links[j]);
+    }
+  });
+  // Back button returns a fresh page (bfcache), so clear the progress state.
+  w.addEventListener("pageshow", function () {
+    root.className = root.className.replace(/ ?go/g, "");
+    d.getElementById("ct").innerHTML = "Get my ID now";
+    d.getElementById("cs").innerHTML = "Free &middot; takes about 2 minutes";
+  });
 
-  // Version B only: sticky bottom button when the main button is off screen.
-  if (AB === "b") {
-    var stk = d.getElementById("stk"), ctaB = d.getElementById("ctaB");
-    if (w.IntersectionObserver) new IntersectionObserver(function (en) {
-      stk.className = en[0].isIntersecting ? "stk js-cta b-only" : "stk js-cta b-only show";
-    }).observe(ctaB);
-    else stk.className = "stk js-cta b-only show";
-  }
-
-  // Tracking after first paint, so it never competes with the page on slow 3G.
-  function after() { pixel("PageView"); hit("view", AB === "c" ? "h_" + hk : null); }
+  function after() { pixel("PageView"); hit("view", "h_" + hk); }
   if (d.readyState === "complete") after(); else w.addEventListener("load", after);
-
-  // Button shine starts on first touch/scroll or 4 s after load (calm first paint).
-  var started = false;
-  function anim() { if (started) return; started = true; d.documentElement.className += " anim"; }
-  var evs = ["touchstart", "mousedown", "scroll", "keydown"];
-  for (var n = 0; n < evs.length; n++) w.addEventListener(evs[n], anim, true);
-  w.addEventListener("load", function () { setTimeout(anim, 4000); });
 })();
 </script>
 </body>
