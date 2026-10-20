@@ -72,7 +72,7 @@ li small{display:block;font-size:13px;color:#9fb0a6}
    Headline is always "Get your 10Sports ID in 60 seconds", except ?v=match on a day with a match set in MATCHES. */
 var SIGNUP_URL = "https://10sports.cricket/register/?c=RikJPxa3";
 var META_PIXEL_ID = "1585304069368231";
-var PAGEVIEW_ALSO_PIXEL_ID = "1022917280660411"; // PageView only (no Lead) also goes to this pixel
+var ALSO_PIXEL_ID = "1022917280660411"; // PageView and Lead also go to this pixel (main 10Sports pixel)
 var STATS_URL = "https://newid.walink.dev/t";
 var MATCHES = [];
 var HEADLINES = {
@@ -131,11 +131,11 @@ var HEADLINES = {
     $("ct").innerHTML = "Opening sign-up&hellip;";
     $("cs").innerHTML = "Please wait, don&rsquo;t tap again";
     $("n").innerHTML = "On a slow network this can take a few seconds.";
-    hit("tap", "c_main_" + hk); pixel("Lead");
+    hit("tap", "c_main_" + hk); pixel("Lead"); if (ALSO_PIXEL_ID) pixel("Lead", ALSO_PIXEL_ID);
   });
   w.addEventListener("pageshow", function () { r.className = ""; $("ct").innerHTML = idle[0]; $("cs").innerHTML = idle[1]; $("n").innerHTML = idle[2]; });
 
-  function after() { pixel("PageView"); if (PAGEVIEW_ALSO_PIXEL_ID) pixel("PageView", PAGEVIEW_ALSO_PIXEL_ID); hit("view", "h_" + hk); }
+  function after() { pixel("PageView"); if (ALSO_PIXEL_ID) pixel("PageView", ALSO_PIXEL_ID); hit("view", "h_" + hk); }
   if (d.readyState === "complete") after(); else w.addEventListener("load", after);
 })();
 </script>
