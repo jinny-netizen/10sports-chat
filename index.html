@@ -72,6 +72,7 @@ li small{display:block;font-size:13px;color:#9fb0a6}
    Headline is always "Get your 10Sports ID in 60 seconds", except ?v=match on a day with a match set in MATCHES. */
 var SIGNUP_URL = "https://10sports.cricket/register/?c=RikJPxa3";
 var META_PIXEL_ID = "1585304069368231";
+var PAGEVIEW_ALSO_PIXEL_ID = "1022917280660411"; // PageView only (no Lead) also goes to this pixel
 var STATS_URL = "https://newid.walink.dev/t";
 var MATCHES = [];
 var HEADLINES = {
@@ -100,12 +101,13 @@ var HEADLINES = {
       if (!body) new Image().src = u;
     } catch (e) {}
   }
-  function pixel(ev) {
+  function pixel(ev, id) {
     if (!LIVE) return;
+    id = id || META_PIXEL_ID;
     try {
       var n = new Date().getTime(), en = encodeURIComponent, fc = qp("fbclid"), fbp = (d.cookie.match(/(?:^|; )_fbp=([^;]+)/) || [])[1];
       if (!fbp) { fbp = "fb.1." + n + "." + Math.floor(Math.random() * 1e10); d.cookie = "_fbp=" + fbp + "; max-age=7776000; path=/; SameSite=Lax"; }
-      send("https://www.facebook.com/tr/?id=" + META_PIXEL_ID + "&ev=" + ev + "&dl=" + en(location.href) + "&rl=" + en(d.referrer) + "&ts=" + n +
+      send("https://www.facebook.com/tr/?id=" + id + "&ev=" + ev + "&dl=" + en(location.href) + "&rl=" + en(d.referrer) + "&ts=" + n +
            "&fbp=" + en(fbp) + "&eid=" + ev.toLowerCase() + "." + n + "." + Math.random().toString(36).slice(2, 10) + (fc ? "&fbc=" + en("fb.1." + n + "." + fc) : ""));
     } catch (e) {}
   }
@@ -133,7 +135,7 @@ var HEADLINES = {
   });
   w.addEventListener("pageshow", function () { r.className = ""; $("ct").innerHTML = idle[0]; $("cs").innerHTML = idle[1]; $("n").innerHTML = idle[2]; });
 
-  function after() { pixel("PageView"); hit("view", "h_" + hk); }
+  function after() { pixel("PageView"); if (PAGEVIEW_ALSO_PIXEL_ID) pixel("PageView", PAGEVIEW_ALSO_PIXEL_ID); hit("view", "h_" + hk); }
   if (d.readyState === "complete") after(); else w.addEventListener("load", after);
 })();
 </script>
