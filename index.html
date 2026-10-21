@@ -134,8 +134,12 @@ var HEADLINES = {
   });
   w.addEventListener("pageshow", function () { r.className = ""; $("ct").innerHTML = idle[0]; $("cs").innerHTML = idle[1]; $("n").innerHTML = idle[2]; });
 
-  function after() { pixel("PageView"); hit("view", "h_" + hk); }
-  if (d.readyState === "complete") after(); else w.addEventListener("load", after);
+  // View tracking right after first paint. It doesn't wait for the load event, which third-party
+  // scripts injected by the host (e.g. Cloudflare Web Analytics) can hold back on slow networks.
+  var sent = false;
+  function after() { if (sent) return; sent = true; pixel("PageView"); hit("view", "h_" + hk); }
+  if (w.requestAnimationFrame) w.requestAnimationFrame(function () { setTimeout(after, 0); });
+  setTimeout(after, 300);
 })();
 </script>
 </body>
