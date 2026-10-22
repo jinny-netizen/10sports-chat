@@ -28,6 +28,13 @@ h1{margin-top:16px;font-size:30px;line-height:1.1;font-weight:900;letter-spacing
 .c strong{display:block;font-size:21px;font-weight:900}
 .c span{display:block;font-size:13px;font-weight:700;color:#4a2300}
 .c:active{opacity:.85}
+.c{box-shadow:0 0 0 3px rgba(255,138,31,.25),0 0 22px rgba(255,138,31,.55);-webkit-animation:g 1.6s ease-in-out infinite;animation:g 1.6s ease-in-out infinite}
+@-webkit-keyframes g{0%,100%{box-shadow:0 0 0 3px rgba(255,138,31,.22),0 0 14px rgba(255,138,31,.35)}50%{box-shadow:0 0 0 7px rgba(255,138,31,.32),0 0 34px rgba(255,150,40,.85)}}
+@keyframes g{0%,100%{box-shadow:0 0 0 3px rgba(255,138,31,.22),0 0 14px rgba(255,138,31,.35)}50%{box-shadow:0 0 0 7px rgba(255,138,31,.32),0 0 34px rgba(255,150,40,.85)}}
+.c:after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.45),rgba(255,255,255,0));-webkit-transform:skewX(-20deg);transform:skewX(-20deg);-webkit-animation:sh 2.8s ease-in-out infinite;animation:sh 2.8s ease-in-out infinite}
+@-webkit-keyframes sh{0%,55%{left:-60%}100%{left:130%}}
+@keyframes sh{0%,55%{left:-60%}100%{left:130%}}
+.go .c{-webkit-animation:none;animation:none}.go .c:after{display:none}
 .c i{display:none;position:absolute;left:0;bottom:0;width:100%;height:4px;background:#1c0a00;opacity:.3;-webkit-transform-origin:0 0;transform-origin:0 0}
 .go .c{background:#ffa552}
 .go .c i{display:block;-webkit-animation:b 12s cubic-bezier(.1,.7,.3,1) forwards;animation:b 12s cubic-bezier(.1,.7,.3,1) forwards}
@@ -42,7 +49,7 @@ li:before{content:counter(k);position:absolute;left:0;top:-1px;width:24px;height
 li small{display:block;font-size:13px;color:#9fb0a6}
 .rg{margin-top:22px;text-align:center;font-size:11px;color:#7f9187}
 @media (max-width:350px){h1{font-size:26px}.o p{font-size:10.5px}.o b{font-size:18px}}
-@media (prefers-reduced-motion:reduce){.go .c i{-webkit-animation:none;animation:none}}
+@media (prefers-reduced-motion:reduce){.go .c i,.c{-webkit-animation:none;animation:none}.c:after{display:none}}
 </style>
 </head>
 <body>
